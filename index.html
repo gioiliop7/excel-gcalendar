@@ -7,10 +7,6 @@
   <body>
     <p>Google Calendar API Quickstart</p>
 
-    <!--Add buttons to initiate auth sequence and sign out-->
-    <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
-    <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
-
     <pre id="content" style="white-space: pre-wrap"></pre>
 
     <form enctype="multipart/form-data">
@@ -40,9 +36,6 @@
       let gapiInited = false;
       let gisInited = false;
 
-      document.getElementById("authorize_button").style.visibility = "hidden";
-      document.getElementById("signout_button").style.visibility = "hidden";
-
       var ExcelToJSON = function () {
         this.parseExcel = function (file) {
           var reader = new FileReader();
@@ -58,9 +51,10 @@
                 workbook.Sheets[sheetName]
               );
               var json_object = JSON.stringify(XL_row_object);
-              console.log(JSON.parse(json_object));
+              json_object = JSON.parse(json_object);
+              handleAuthClick(json_object);
             });
-            handleAuthClick();
+            
           };
 
           reader.onerror = function (ex) {
@@ -99,7 +93,6 @@
           discoveryDocs: [DISCOVERY_DOC],
         });
         gapiInited = true;
-        maybeEnableButtons();
       }
 
       /**
@@ -112,32 +105,18 @@
           callback: "", // defined later
         });
         gisInited = true;
-        maybeEnableButtons();
-      }
-
-      /**
-       * Enables user interaction after all libraries are loaded.
-       */
-      function maybeEnableButtons() {
-        if (gapiInited && gisInited) {
-          document.getElementById("authorize_button").style.visibility =
-            "visible";
-        }
       }
 
       /**
        *  Sign in the user upon button click.
        */
-      function handleAuthClick() {
+      function handleAuthClick(data) {
         tokenClient.callback = async (resp) => {
           if (resp.error !== undefined) {
             throw resp;
           }
-          document.getElementById("signout_button").style.visibility =
-            "visible";
-          document.getElementById("authorize_button").innerText = "Refresh";
-          console.log()
-          await addEventsToCalendar();
+          console.log(resp);
+          await addEventsToCalendar(data);
         };
 
         if (gapi.client.getToken() === null) {
@@ -164,33 +143,35 @@
         }
       }
 
-      async function addEventsToCalendar() {
-        var event = {
-          summary: "Google I/O 2015",
-          location: "800 Howard St., San Francisco, CA 94103",
-          description:
-            "A chance to hear more about Google's developer products.",
-          start: {
-            dateTime: "2022-05-06T09:00:00-07:00",
-            timeZone: "America/Los_Angeles",
-          },
-          end: {
-            dateTime: "2022-05-06T17:00:00-07:00",
-            timeZone: "America/Los_Angeles",
-          },
-          reminders: {
-            useDefault: false,
-            overrides: [
-              { method: "email", minutes: 24 * 60 },
-              { method: "popup", minutes: 10 },
-            ],
-          },
-        };
+      async function addEventsToCalendar(data) {
+        console.log(data);
+        return;
+        // var event = {
+        //   summary: "Google I/O 2015",
+        //   location: "800 Howard St., San Francisco, CA 94103",
+        //   description:
+        //     "A chance to hear more about Google's developer products.",
+        //   start: {
+        //     dateTime: "2022-05-06T09:00:00-07:00",
+        //     timeZone: "America/Los_Angeles",
+        //   },
+        //   end: {
+        //     dateTime: "2022-05-06T17:00:00-07:00",
+        //     timeZone: "America/Los_Angeles",
+        //   },
+        //   reminders: {
+        //     useDefault: false,
+        //     overrides: [
+        //       { method: "email", minutes: 24 * 60 },
+        //       { method: "popup", minutes: 10 },
+        //     ],
+        //   },
+        // };
 
-        var request = await gapi.client.calendar.events.insert({
-          calendarId: "primary",
-          resource: event,
-        });
+        // var request = await gapi.client.calendar.events.insert({
+        //   calendarId: "primary",
+        //   resource: event,
+        // });
       }
     </script>
 
