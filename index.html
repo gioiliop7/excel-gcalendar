@@ -80,6 +80,13 @@
 
       var input = document.getElementById("upload");
       input.addEventListener("change", function () {
+        let file = input.files[0];
+        console.log(file.type);
+        if (file.type != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+          alert("Please select XLSX files only!");
+          this.value = "";
+          return;
+        }
         readXlsxFile(input.files[0]).then(function (rows) {
           handleAuthClick(rows);
         });
