@@ -14,11 +14,6 @@
     </form>
 
     <script type="text/javascript">
-      /* exported gapiLoaded */
-      /* exported gisLoaded */
-      /* exported handleAuthClick */
-
-      // TODO(developer): Set to client ID and API key from the Developer Console
       const CLIENT_ID =
         "180927654047-fhtjm41hh2a48sj05u6k9nfv50cdtkcq.apps.googleusercontent.com";
       const API_KEY = "AIzaSyBCvcGw-xwbTxKzV4uok0WZ07ZbFaVLk8Q";
@@ -66,13 +61,10 @@
         gisInited = true;
       }
 
-      var data;
       var input = document.getElementById("upload");
       input.addEventListener("change", function () {
         readXlsxFile(input.files[0]).then(function (rows) {
           handleAuthClick(rows);
-          // `rows` is an array of rows
-          // each row being an array of cells.
         });
       });
 
@@ -98,34 +90,93 @@
       }
 
       async function addEventsToCalendar(data) {
-        console.log(data);
-        return;
-        // var event = {
-        //   summary: "Google I/O 2015",
-        //   location: "800 Howard St., San Francisco, CA 94103",
-        //   description:
-        //     "A chance to hear more about Google's developer products.",
-        //   start: {
-        //     dateTime: "2022-05-06T09:00:00-07:00",
-        //     timeZone: "America/Los_Angeles",
-        //   },
-        //   end: {
-        //     dateTime: "2022-05-06T17:00:00-07:00",
-        //     timeZone: "America/Los_Angeles",
-        //   },
-        //   reminders: {
-        //     useDefault: false,
-        //     overrides: [
-        //       { method: "email", minutes: 24 * 60 },
-        //       { method: "popup", minutes: 10 },
-        //     ],
-        //   },
-        // };
+        // console.log(data);
+        let dates = data[3];
+        const mineData = data[7];
+        dates.pop();
+        dates.shift();
+        mineData.shift();
+        mineData.pop();
+        console.log(mineData);
 
-        // var request = await gapi.client.calendar.events.insert({
-        //   calendarId: "primary",
-        //   resource: event,
-        // });
+        let i, j;
+
+        for (i = 0; i < dates.length; i++) {
+          for (j = 0; j < mineData.length; j++) {
+            if (i == j) {
+              let date = dates[i].toISOString();
+              date = date.replace("00:00:00.000Z", "");
+              const newDate = new Date();
+              const offset = newDate.getTimezoneOffset();
+              let hours = Math.floor(offset / 60);
+              hours = Math.abs(hours);
+              let hours_string = hours.toString();
+              if (hours_string.length == 1) {
+                hours_string = `0${hours_string}`;
+              }
+              // console.log(date);
+              // console.log(mineData[j]);
+              let startDate, endDate, vacc;
+              switch (mineData[j]) {
+                case "Αf":
+                  startDate = "14:00:00";
+                  endDate = "20:00:00";
+                  vacc = "Pfizer";
+                  break;
+                case "Πf":
+                  startDate = "08:00:00";
+                  endDate = "14:00:00";
+                  vacc = "Pfizer";
+                  break;
+                case "Αm":
+                  startDate = "14:00:00";
+                  endDate = "20:00:00";
+                  vacc = "Moderna";
+                  break;
+                case "Πm":
+                  startDate = "08:00:00";
+                  endDate = "14:00:00";
+                  vacc = "Moderna";
+                  break;
+                default:
+                  startDate = "null";
+                  endDate = "null";
+                  vacc = "null";
+                  break;
+              }
+              if (startDate.includes(":") && endDate.includes(":")) {
+                const startDateTimeString = `${date}${startDate}+${hours_string}:00`;
+                const EndDateTimeString = `${date}${endDate}+${hours_string}:00`;
+                var event = {
+                  summary: `${vacc}`,
+                  location: "ΜΕΓΑ ΕΜΒΟΛΙΑΣΤΙΚΟ ΓΛΥΦΑΔΑΣ",
+                  description: `Βάρδια στο εμβολιαστικο ${date} - ${vacc}`,
+                  start: {
+                    dateTime: startDateTimeString,
+                    timeZone: "Europe/Athens",
+                  },
+                  end: {
+                    dateTime: EndDateTimeString,
+                    timeZone: "Europe/Athens",
+                  },
+                  reminders: {
+                    useDefault: false,
+                    overrides: [
+                      { method: "email", minutes: 24 * 60 },
+                      { method: "popup", minutes: 10 },
+                    ],
+                  },
+                };
+
+                var request = await gapi.client.calendar.events.insert({
+                  calendarId: "primary",
+                  resource: event,
+                });
+              }
+            }
+          }
+        }
+        return;
       }
     </script>
 
