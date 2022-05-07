@@ -15,3 +15,5 @@ https://codepen.io/kbocz/pen/vbBEBN
 ### Libraries used
 
     https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js
+
+**The project is for specific type of excel, so if you want the same result, you should take another data. Also, you should make an app on google cloud platform and enable calendar API**
