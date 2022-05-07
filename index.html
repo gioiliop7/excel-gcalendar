@@ -1,17 +1,34 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Google Calendar API Quickstart</title>
+    <title>Vaccination Calendar</title>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <p>Google Calendar API Quickstart</p>
+    <div class="frame">
+      <div class="center">
+        <div class="title">
+          <h1>Drop file to upload</h1>
+        </div>
 
-    <pre id="content" style="white-space: pre-wrap"></pre>
+        <div class="dropzone">
+          <img
+            src="http://100dayscss.com/codepen/upload.svg"
+            class="upload-icon"
+          />
+          <input type="file" id="upload" class="upload-input" />
+        </div>
 
-    <form enctype="multipart/form-data">
+        <button type="button" class="btn" name="uploadbutton">
+          Upload file
+        </button>
+      </div>
+    </div>
+
+    <!-- <form enctype="multipart/form-data">
       <input id="upload" type="file" name="files[]" />
-    </form>
+    </form> -->
 
     <script type="text/javascript">
       const CLIENT_ID =
@@ -90,7 +107,6 @@
       }
 
       async function addEventsToCalendar(data) {
-        // console.log(data);
         let dates = data[3];
         const mineData = data[7];
         dates.pop();
