@@ -17,7 +17,6 @@
       /* exported gapiLoaded */
       /* exported gisLoaded */
       /* exported handleAuthClick */
-      /* exported handleSignoutClick */
 
       // TODO(developer): Set to client ID and API key from the Developer Console
       const CLIENT_ID =
@@ -35,46 +34,6 @@
       let tokenClient;
       let gapiInited = false;
       let gisInited = false;
-
-      var ExcelToJSON = function () {
-        this.parseExcel = function (file) {
-          var reader = new FileReader();
-
-          reader.onload = function (e) {
-            var data = e.target.result;
-            var workbook = XLSX.read(data, {
-              type: "binary",
-            });
-            workbook.SheetNames.forEach(function (sheetName) {
-              // Here is your object
-              var XL_row_object = XLSX.utils.sheet_to_row_object_array(
-                workbook.Sheets[sheetName]
-              );
-              var json_object = JSON.stringify(XL_row_object);
-              json_object = JSON.parse(json_object);
-              handleAuthClick(json_object);
-            });
-            
-          };
-
-          reader.onerror = function (ex) {
-            console.log(ex);
-          };
-
-          reader.readAsBinaryString(file);
-        };
-      };
-
-      function handleFileSelect(evt) {
-        var files = evt.target.files; // FileList object
-        var xl2json = new ExcelToJSON();
-        xl2json.parseExcel(files[0]);
-      }
-
-      
-     document
-        .getElementById("upload")
-        .addEventListener("change", handleFileSelect, false);
 
       /**
        * Callback after api.js is loaded.
@@ -107,6 +66,16 @@
         gisInited = true;
       }
 
+      var data;
+      var input = document.getElementById("upload");
+      input.addEventListener("change", function () {
+        readXlsxFile(input.files[0]).then(function (rows) {
+          handleAuthClick(rows);
+          // `rows` is an array of rows
+          // each row being an array of cells.
+        });
+      });
+
       /**
        *  Sign in the user upon button click.
        */
@@ -115,7 +84,6 @@
           if (resp.error !== undefined) {
             throw resp;
           }
-          console.log(resp);
           await addEventsToCalendar(data);
         };
 
@@ -126,20 +94,6 @@
         } else {
           // Skip display of account chooser and consent dialog for an existing session.
           tokenClient.requestAccessToken({ prompt: "" });
-        }
-      }
-
-      /**
-       *  Sign out the user upon button click.
-       */
-      function handleSignoutClick() {
-        const token = gapi.client.getToken();
-        if (token !== null) {
-          google.accounts.oauth2.revoke(token.access_token);
-          gapi.client.setToken("");
-          document.getElementById("content").innerText = "";
-          document.getElementById("authorize_button").innerText = "Authorize";
-          document.getElementById("signout_button").style.visibility = "hidden";
         }
       }
 
@@ -175,9 +129,7 @@
       }
     </script>
 
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+    <script src="https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js"></script>
     <script
       src="https://code.jquery.com/jquery-3.6.0.js"
       integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
@@ -195,6 +147,5 @@
       src="https://accounts.google.com/gsi/client"
       onload="gisLoaded()"
     ></script>
-
   </body>
 </html>
